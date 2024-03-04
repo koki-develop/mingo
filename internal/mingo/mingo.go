@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"strings"
 )
 
 func MinifyFile(filename string) (string, error) {
@@ -25,13 +26,16 @@ func Minify(filename string, src []byte) (string, error) {
 		return "", err
 	}
 
+	sb := new(strings.Builder)
 	ast.Inspect(file, func(n ast.Node) bool {
 		switch x := n.(type) {
+		case *ast.File:
+			fmt.Fprintf(sb, "package %s;", x.Name.Name)
 		default:
 			fmt.Printf("%T\n", x)
 		}
 		return true
 	})
 
-	return "", nil
+	return sb.String(), nil
 }
