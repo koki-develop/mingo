@@ -116,7 +116,7 @@ func stringifySliceExpr(expr *ast.SliceExpr) string {
 	if expr.Low != nil {
 		sb.WriteString(stringifyExpr(expr.Low))
 	}
-	sb.WriteString(":") // FIXME
+	sb.WriteString(":")
 	if expr.High != nil {
 		sb.WriteString(stringifyExpr(expr.High))
 	}
