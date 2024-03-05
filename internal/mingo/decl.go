@@ -73,10 +73,12 @@ func stringifyImportSpecs(specs []*ast.ImportSpec) string {
 
 func stringifyConstSpecs(specs []*ast.ValueSpec) string {
 	sb := new(strings.Builder)
-	sb.WriteString("const ")
+	sb.WriteString("const")
 
 	if len(specs) > 1 {
 		sb.WriteString("(")
+	} else {
+		sb.WriteString(" ")
 	}
 
 	for i, spec := range specs {
@@ -85,18 +87,23 @@ func stringifyConstSpecs(specs []*ast.ValueSpec) string {
 		}
 		for j, name := range spec.Names {
 			if j > 0 {
-				sb.WriteString(";")
+				sb.WriteString(",")
 			}
 			sb.WriteString(name.Name)
+		}
 
-			if spec.Values != nil {
-				sb.WriteString("=")
-				for k, value := range spec.Values {
-					if k > 0 {
-						sb.WriteString(",")
-					}
-					sb.WriteString(stringifyExpr(value))
+		if spec.Type != nil {
+			sb.WriteString(" ")
+			sb.WriteString(stringifyExpr(spec.Type))
+		}
+
+		if spec.Values != nil {
+			sb.WriteString("=")
+			for k, value := range spec.Values {
+				if k > 0 {
+					sb.WriteString(",")
 				}
+				sb.WriteString(stringifyExpr(value))
 			}
 		}
 	}

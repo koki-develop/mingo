@@ -60,8 +60,11 @@ func stringifyBlockStmt(stmt *ast.BlockStmt) string {
 	sb.WriteString("{")
 	for i, child := range stmt.List {
 		sb.WriteString(stringifyStmt(child))
-		if i < len(stmt.List)-1 {
-			sb.WriteString(";")
+
+		if _, ok := child.(*ast.DeclStmt); !ok {
+			if i < len(stmt.List)-1 {
+				sb.WriteString(";")
+			}
 		}
 	}
 	sb.WriteString("}")
