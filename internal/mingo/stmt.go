@@ -1,7 +1,9 @@
 package mingo
 
 import (
+	"fmt"
 	"go/ast"
+	"go/token"
 	"strings"
 )
 
@@ -21,8 +23,26 @@ func stringifyStmt(stmt ast.Stmt) string {
 			}
 			sb.WriteString(stringifyExpr(expr))
 		}
+	case *ast.AssignStmt:
+		for i, expr := range x.Lhs {
+			if i > 0 {
+				sb.WriteString(",")
+			}
+			sb.WriteString(stringifyExpr(expr))
+		}
+		if x.Tok == token.DEFINE {
+			sb.WriteString(":=")
+		} else {
+			sb.WriteString("=")
+		}
+		for i, expr := range x.Rhs {
+			if i > 0 {
+				sb.WriteString(",")
+			}
+			sb.WriteString(stringifyExpr(expr))
+		}
 	default:
-		// fmt.Printf("%#v", x)
+		fmt.Printf("stmt: %#v\n", x)
 	}
 
 	sb.WriteString(";")
