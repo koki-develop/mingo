@@ -131,8 +131,32 @@ type S2 struct {
 	F4 func(s string)
 	F5 func(string)
 	F6 func(s1, s2 string)
+	F7 func(f1 func() string)
 }`,
-			want: `package main;type S1 struct{S struct{A string;B int;C bool};F1 func()string;F2 func()(string,error);F3 func()(s string,err error)};type S2 struct{S1;A string;B int;C bool;a string;b int;c bool;F4 func(s string);F5 func(string);F6 func(s1,s2 string)};`,
+			want: `package main;type S1 struct{S struct{A string;B int;C bool};F1 func()string;F2 func()(string,error);F3 func()(s string,err error)};type S2 struct{S1;A string;B int;C bool;a string;b int;c bool;F4 func(s string);F5 func(string);F6 func(s1,s2 string);F7 func(f1 func()string)};`,
+		},
+		{
+			name: "interface",
+			src: `package main
+
+type I1 interface {
+	F1() string
+	F2() (string, error)
+	F3() (s string, err error)
+}
+
+type I2 interface {
+	I1
+
+	F4(s string)
+	F5(string)
+	F6(s1, s2 string)
+	F7(s1 string, s2 string)
+	F8(s1, s2 string, i int)
+	F9(f func() string)
+}
+`,
+			want: `package main;type I1 interface{F1()string;F2()(string,error);F3()(s string,err error)};type I2 interface{I1;F4(s string);F5(string);F6(s1,s2 string);F7(s1 string,s2 string);F8(s1,s2 string,i int);F9(f func()string)};`,
 		},
 	}
 

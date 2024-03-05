@@ -197,7 +197,13 @@ func stringifyInterfaceType(expr *ast.InterfaceType) string {
 		for _, name := range field.Names {
 			sb.WriteString(name.Name)
 		}
-		sb.WriteString(stringifyExpr(field.Type))
+		if f, ok := field.Type.(*ast.FuncType); ok {
+			sb.WriteString(stringifyFuncTypeParams(f.TypeParams))
+			sb.WriteString(stringifyFuncParams(f.Params))
+			sb.WriteString(stringifyFuncResults(f.Results))
+		} else {
+			sb.WriteString(stringifyExpr(field.Type))
+		}
 	}
 	sb.WriteString("}")
 
