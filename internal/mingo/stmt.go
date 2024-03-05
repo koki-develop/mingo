@@ -268,6 +268,10 @@ func stringifyRangeStmt(stmt *ast.RangeStmt) string {
 func stringifyBranchStmt(stmt *ast.BranchStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString(stmt.Tok.String())
+	if stmt.Label != nil {
+		sb.WriteString(" ")
+		sb.WriteString(stmt.Label.Name)
+	}
 	return sb.String()
 }
 

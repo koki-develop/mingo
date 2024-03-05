@@ -211,6 +211,22 @@ func main() {
 `,
 			want: `package main;import "fmt";func hello(){func(){fmt.Println("Hello")}();func(s string){fmt.Printf("Hello, %s\n",s)}("world");if err:=func()error{return nil}();err!=nil{fmt.Println(err)}};func main(){go hello()};`,
 		},
+		{
+			name: "goto",
+			src: `package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("A")
+	goto label
+	fmt.Println("B")
+label:
+	fmt.Println("C")
+}
+`,
+			want: `package main;import "fmt";func main(){fmt.Println("A");goto label;fmt.Println("B");label:fmt.Println("C")};`,
+		},
 	}
 
 	for _, tc := range testcases {
