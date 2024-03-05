@@ -9,10 +9,12 @@ import (
 func minifyFuncDecl(n *ast.FuncDecl) string {
 	sb := new(strings.Builder)
 
-	sb.WriteString("func ")
+	sb.WriteString("func")
 
 	if n.Recv != nil {
-		// TODO
+		sb.WriteString(stringifyFuncParams(n.Recv))
+	} else {
+		sb.WriteString(" ")
 	}
 
 	fmt.Fprintf(sb, "%s", n.Name.Name)
@@ -51,7 +53,10 @@ func stringifyFuncParams(params *ast.FieldList) string {
 			sb.WriteString(name.Name)
 		}
 
-		sb.WriteString(" ")
+		if len(arg.Names) > 0 {
+			sb.WriteString(" ")
+		}
+
 		sb.WriteString(stringifyExpr(arg.Type))
 	}
 
