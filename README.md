@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-Go also wants to be minified.
+<b><i>Go also wants to be minified.</i></b>
 </p>
 
 ## Contents
