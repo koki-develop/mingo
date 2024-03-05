@@ -363,6 +363,34 @@ func main() {
 `,
 			want: `package main;func main(){for {break};for i:=0;i<10;i++{println(i)};for i:=0;i<10;{println(i);i++};for i:=0;;i++{if i>=10{break};println(i)};i:=0;for ;i<10;i++{println(i)};for i<20{println(i);i++};for true{break}};`,
 		},
+		{
+			name: "range",
+			src: `package main
+
+func main() {
+	for range 10 {
+		break
+	}
+
+	for i := range 10 {
+		println(i)
+	}
+
+	for _, s := range []string{"a", "b", "c"} {
+		println(s)
+	}
+
+	for i, s := range []string{"a", "b", "c"} {
+		println(i, s)
+	}
+
+	for i := range []string{"a", "b", "c"} {
+		println(i)
+	}
+}
+`,
+			want: `package main;func main(){for range 10{break};for i:=range 10{println(i)};for _,s:=range []string{"a","b","c"}{println(s)};for i,s:=range []string{"a","b","c"}{println(i,s)};for i:=range []string{"a","b","c"}{println(i)}};`,
+		},
 	}
 
 	for _, tc := range testcases {

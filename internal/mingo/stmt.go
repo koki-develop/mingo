@@ -250,10 +250,10 @@ func stringifyRangeStmt(stmt *ast.RangeStmt) string {
 	if stmt.Key != nil {
 		needAssign = true
 		sb.WriteString(stringifyExpr(stmt.Key))
-		sb.WriteString(",")
 	}
 	if stmt.Value != nil {
 		needAssign = true
+		sb.WriteString(",")
 		sb.WriteString(stringifyExpr(stmt.Value))
 	}
 
