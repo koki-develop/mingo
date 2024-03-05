@@ -16,168 +16,259 @@ func stringifySelectExpr(expr *ast.SelectorExpr) string {
 }
 
 func stringifyExpr(expr ast.Expr) string {
-	sb := new(strings.Builder)
-
 	switch x := expr.(type) {
 	case *ast.BasicLit:
-		sb.WriteString(x.Value)
+		return stringifyBasicLit(x)
 	case *ast.CallExpr:
-		sb.WriteString(stringifyExpr(x.Fun))
-		sb.WriteString("(")
-		for i, arg := range x.Args {
-			if i > 0 {
-				sb.WriteString(",")
-			}
-			sb.WriteString(stringifyExpr(arg))
-		}
-		sb.WriteString(")")
+		return stringifyCallExpr(x)
 	case *ast.SelectorExpr:
-		sb.WriteString(stringifySelectExpr(x))
+		return stringifySelectExpr(x)
 	case *ast.StarExpr:
-		sb.WriteString("*")
-		sb.WriteString(stringifyExpr(x.X))
+		return stringifyStarExpr(x)
 	case *ast.ArrayType:
-		sb.WriteString("[]")
-		sb.WriteString(stringifyExpr(x.Elt))
+		return stringifyArrayType(x)
 	case *ast.Ellipsis:
-		sb.WriteString("...")
-		sb.WriteString(stringifyExpr(x.Elt))
+		return stringifyEllipsis(x)
 	case *ast.FuncLit:
 		// TODO
 	case *ast.BinaryExpr:
-		sb.WriteString(stringifyExpr(x.X))
-		sb.WriteString(x.Op.String())
-		sb.WriteString(stringifyExpr(x.Y))
+		return stringifyBinaryExpr(x)
 	case *ast.SliceExpr:
-		sb.WriteString(stringifyExpr(x.X))
-		sb.WriteString("[")
-		if x.Low != nil {
-			sb.WriteString(stringifyExpr(x.Low))
-		}
-		sb.WriteString(":") // FIXME
-		if x.High != nil {
-			sb.WriteString(stringifyExpr(x.High))
-		}
-		if x.Max != nil {
-			sb.WriteString(":")
-			sb.WriteString(stringifyExpr(x.Max))
-		}
-		sb.WriteString("]")
+		return stringifySliceExpr(x)
 	case *ast.UnaryExpr:
-		sb.WriteString(x.Op.String())
-		sb.WriteString(stringifyExpr(x.X))
+		return stringifyUnaryExpr(x)
 	case *ast.CompositeLit:
-		sb.WriteString(stringifyExpr(x.Type))
-		sb.WriteString("{")
-		for i, elt := range x.Elts {
-			if i > 0 {
-				sb.WriteString(",")
-			}
-			sb.WriteString(stringifyExpr(elt))
-		}
-		sb.WriteString("}")
+		return stringifyCompositeLit(x)
 	case *ast.ParenExpr:
-		sb.WriteString("(")
-		sb.WriteString(stringifyExpr(x.X))
-		sb.WriteString(")")
+		return stringifyParenExpr(x)
 	case *ast.IndexExpr:
-		sb.WriteString(stringifyExpr(x.X))
-		sb.WriteString("[")
-		sb.WriteString(stringifyExpr(x.Index))
-		sb.WriteString("]")
+		return stringifyIndexExpr(x)
 	case *ast.KeyValueExpr:
-		sb.WriteString(stringifyExpr(x.Key))
-		sb.WriteString(":")
-		sb.WriteString(stringifyExpr(x.Value))
+		return stringifyKeyValueExpr(x)
 	case *ast.TypeAssertExpr:
-		sb.WriteString(stringifyExpr(x.X))
-		sb.WriteString(".(")
-		sb.WriteString(stringifyExpr(x.Type))
-		sb.WriteString(")")
+		return stringifyTypeAssertExpr(x)
 	case *ast.ChanType:
-		if x.Dir == ast.RECV {
-			sb.WriteString("<-")
-		}
-		sb.WriteString("chan")
-		sb.WriteString(stringifyExpr(x.Value))
+		return stringifyChanType(x)
 	case *ast.MapType:
-		sb.WriteString("map[")
-		sb.WriteString(stringifyExpr(x.Key))
-		sb.WriteString("]")
-		sb.WriteString(stringifyExpr(x.Value))
+		return stringifyMapType(x)
 	case *ast.InterfaceType:
-		sb.WriteString("interface{}")
+		return stringifyInterfaceType(x)
 	case *ast.StructType:
-		sb.WriteString("struct{")
-		for i, field := range x.Fields.List {
-			if i > 0 {
-				sb.WriteString(";")
-			}
-			for j, name := range field.Names {
-				if j > 0 {
-					sb.WriteString(",")
-				}
-				sb.WriteString(name.Name)
-			}
-			sb.WriteString(" ")
-			sb.WriteString(stringifyExpr(field.Type))
-		}
-		sb.WriteString("}")
+		return stringifyStructType(x)
 	case *ast.FuncType:
-		sb.WriteString("func(")
+		return stringifyFuncType(x)
+	}
 
-		// args
-		for i, arg := range x.Params.List {
-			if i > 0 {
+	return expr.(*ast.Ident).Name
+}
+
+func stringifyBasicLit(lit *ast.BasicLit) string {
+	return lit.Value
+}
+
+func stringifyCallExpr(expr *ast.CallExpr) string {
+	sb := new(strings.Builder)
+
+	sb.WriteString(stringifyExpr(expr.Fun))
+	sb.WriteString("(")
+	for i, arg := range expr.Args {
+		if i > 0 {
+			sb.WriteString(",")
+		}
+		sb.WriteString(stringifyExpr(arg))
+	}
+	sb.WriteString(")")
+
+	return sb.String()
+}
+
+func stringifyStarExpr(expr *ast.StarExpr) string {
+	return fmt.Sprintf("*%s", stringifyExpr(expr.X))
+}
+
+func stringifyArrayType(expr *ast.ArrayType) string {
+	return fmt.Sprintf("[]%s", stringifyExpr(expr.Elt))
+}
+
+func stringifyEllipsis(expr *ast.Ellipsis) string {
+	return fmt.Sprintf("...%s", stringifyExpr(expr.Elt))
+}
+
+func stringifyBinaryExpr(expr *ast.BinaryExpr) string {
+	return fmt.Sprintf("%s%s%s", stringifyExpr(expr.X), expr.Op.String(), stringifyExpr(expr.Y))
+}
+
+func stringifySliceExpr(expr *ast.SliceExpr) string {
+	sb := new(strings.Builder)
+
+	sb.WriteString(stringifyExpr(expr.X))
+	sb.WriteString("[")
+	if expr.Low != nil {
+		sb.WriteString(stringifyExpr(expr.Low))
+	}
+	sb.WriteString(":") // FIXME
+	if expr.High != nil {
+		sb.WriteString(stringifyExpr(expr.High))
+	}
+	if expr.Max != nil {
+		sb.WriteString(":")
+		sb.WriteString(stringifyExpr(expr.Max))
+	}
+	sb.WriteString("]")
+
+	return sb.String()
+}
+
+func stringifyUnaryExpr(expr *ast.UnaryExpr) string {
+	return fmt.Sprintf("%s%s", expr.Op.String(), stringifyExpr(expr.X))
+}
+
+func stringifyCompositeLit(expr *ast.CompositeLit) string {
+	sb := new(strings.Builder)
+
+	sb.WriteString(stringifyExpr(expr.Type))
+	sb.WriteString("{")
+	for i, elt := range expr.Elts {
+		if i > 0 {
+			sb.WriteString(",")
+		}
+		sb.WriteString(stringifyExpr(elt))
+	}
+	sb.WriteString("}")
+
+	return sb.String()
+}
+
+func stringifyParenExpr(expr *ast.ParenExpr) string {
+	return fmt.Sprintf("(%s)", stringifyExpr(expr.X))
+}
+
+func stringifyIndexExpr(expr *ast.IndexExpr) string {
+	return fmt.Sprintf("%s[%s]", stringifyExpr(expr.X), stringifyExpr(expr.Index))
+}
+
+func stringifyKeyValueExpr(expr *ast.KeyValueExpr) string {
+	return fmt.Sprintf("%s:%s", stringifyExpr(expr.Key), stringifyExpr(expr.Value))
+}
+
+func stringifyTypeAssertExpr(expr *ast.TypeAssertExpr) string {
+	return fmt.Sprintf("%s.(%s)", stringifyExpr(expr.X), stringifyExpr(expr.Type))
+}
+
+func stringifyChanType(expr *ast.ChanType) string {
+	sb := new(strings.Builder)
+
+	if expr.Dir == ast.RECV {
+		sb.WriteString("<-")
+	}
+	sb.WriteString("chan")
+	sb.WriteString(stringifyExpr(expr.Value))
+
+	return sb.String()
+}
+
+func stringifyMapType(expr *ast.MapType) string {
+	return fmt.Sprintf("map[%s]%s", stringifyExpr(expr.Key), stringifyExpr(expr.Value))
+}
+
+func stringifyInterfaceType(expr *ast.InterfaceType) string {
+	sb := new(strings.Builder)
+
+	sb.WriteString("interface{")
+	for i, field := range expr.Methods.List {
+		if i > 0 {
+			sb.WriteString(";")
+		}
+		for j, name := range field.Names {
+			if j > 0 {
 				sb.WriteString(",")
 			}
-			for j, name := range arg.Names {
-				if j > 0 {
-					sb.WriteString(",")
-				}
-				sb.WriteString(name.Name)
-			}
-			sb.WriteString(" ")
-			sb.WriteString(stringifyExpr(arg.Type))
+			sb.WriteString(name.Name)
 		}
-		sb.WriteString(")")
+		sb.WriteString(" ")
+		sb.WriteString(stringifyExpr(field.Type))
+	}
+	sb.WriteString("}")
 
-		// result
-		if x.Results != nil {
-			rb := new(strings.Builder)
+	return sb.String()
+}
 
-			needParens := false
-			if len(x.Results.List) > 1 {
-				needParens = true
+func stringifyStructType(expr *ast.StructType) string {
+	sb := new(strings.Builder)
+
+	sb.WriteString("struct{")
+	for i, field := range expr.Fields.List {
+		if i > 0 {
+			sb.WriteString(";")
+		}
+		for j, name := range field.Names {
+			if j > 0 {
+				sb.WriteString(",")
+			}
+			sb.WriteString(name.Name)
+		}
+		sb.WriteString(" ")
+		sb.WriteString(stringifyExpr(field.Type))
+	}
+	sb.WriteString("}")
+
+	return sb.String()
+}
+
+func stringifyFuncType(expr *ast.FuncType) string {
+	sb := new(strings.Builder)
+
+	sb.WriteString("func(")
+
+	// args
+	for i, arg := range expr.Params.List {
+		if i > 0 {
+			sb.WriteString(",")
+		}
+		for j, name := range arg.Names {
+			if j > 0 {
+				sb.WriteString(",")
+			}
+			sb.WriteString(name.Name)
+		}
+		sb.WriteString(" ")
+		sb.WriteString(stringifyExpr(arg.Type))
+	}
+	sb.WriteString(")")
+
+	// result
+	if expr.Results != nil {
+		rb := new(strings.Builder)
+
+		needParens := false
+		if len(expr.Results.List) > 1 {
+			needParens = true
+		}
+
+		for i, rslt := range expr.Results.List {
+			if i > 0 {
+				rb.WriteString(",")
 			}
 
-			for i, rslt := range x.Results.List {
-				if i > 0 {
+			for j, name := range rslt.Names {
+				needParens = true
+				if j > 0 {
 					rb.WriteString(",")
 				}
-
-				for j, name := range rslt.Names {
-					needParens = true
-					if j > 0 {
-						rb.WriteString(",")
-					}
-					rb.WriteString(name.Name)
-					rb.WriteString(" ")
-				}
-
-				rb.WriteString(stringifyExpr(rslt.Type))
+				rb.WriteString(name.Name)
+				rb.WriteString(" ")
 			}
 
-			if needParens {
-				sb.WriteString("(")
-			}
-			sb.WriteString(rb.String())
-			if needParens {
-				sb.WriteString(")")
-			}
+			rb.WriteString(stringifyExpr(rslt.Type))
 		}
-	default:
-		sb.WriteString(x.(*ast.Ident).Name)
+
+		if needParens {
+			sb.WriteString("(")
+		}
+		sb.WriteString(rb.String())
+		if needParens {
+			sb.WriteString(")")
+		}
 	}
 
 	return sb.String()
