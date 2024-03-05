@@ -51,8 +51,9 @@ Usage:
   mingo [flags] [files]...
 
 Flags:
-  -h, --help    help for mingo
-  -w, --write   write result to (source) file instead of stdout
+  -h, --help      help for mingo
+  -v, --version   version for mingo
+  -w, --write     write result to (source) file instead of stdout
 ```
 
 ### Example
