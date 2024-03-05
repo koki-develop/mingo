@@ -307,9 +307,11 @@ func stringifyCaseCaluse(stmt *ast.CaseClause) string {
 	} else {
 		sb.WriteString("default:")
 	}
-	for _, stmt := range stmt.Body {
-		sb.WriteString(stringifyStmt(stmt))
-		sb.WriteString(";")
+	for i, child := range stmt.Body {
+		sb.WriteString(stringifyStmt(child))
+		if i < len(stmt.Body)-1 {
+			sb.WriteString(";")
+		}
 	}
 
 	return sb.String()
