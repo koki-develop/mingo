@@ -1,6 +1,7 @@
 package mingo
 
 import (
+	"go/format"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -65,6 +66,9 @@ func run2() (string, error) {
 
 			assert.NoError(t, err)
 			assert.Equal(t, tc.want, got)
+
+			_, err = format.Source([]byte(got))
+			assert.NoError(t, err)
 		})
 	}
 }
