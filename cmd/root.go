@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/koki-develop/mingo/internal/mingo"
 	"github.com/spf13/cobra"
@@ -17,33 +18,56 @@ var rootCmd = &cobra.Command{
 	Use: "mingo",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for i, file := range args {
-			src, err := os.ReadFile(file)
-			if err != nil {
-				return err
-			}
-
-			var out io.Writer
-			if flagWrite {
-				f, err := os.Create(file)
+			err := filepath.WalkDir(file, func(path string, d os.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
-				defer f.Close()
 
-				out = f
-			} else {
-				out = os.Stdout
-				if i > 0 {
-					fmt.Fprintln(out)
+				if d.IsDir() {
+					return nil
 				}
-			}
 
-			min, err := mingo.Minify(file, src)
+				if filepath.Ext(path) != ".go" {
+					return nil
+				}
+
+				src, err := os.ReadFile(path)
+				if err != nil {
+					return err
+				}
+
+				var out io.Writer
+				if flagWrite {
+					f, err := os.Create(path)
+					if err != nil {
+						return err
+					}
+					defer f.Close()
+
+					out = f
+				} else {
+					out = os.Stdout
+					if i > 0 {
+						if _, err := fmt.Fprintln(out); err != nil {
+							return err
+						}
+					}
+				}
+
+				min, err := mingo.Minify(path, src)
+				if err != nil {
+					return err
+				}
+
+				if _, err := fmt.Fprint(out, min); err != nil {
+					return err
+				}
+
+				return nil
+			})
 			if err != nil {
 				return err
 			}
-
-			fmt.Fprint(out, min)
 		}
 
 		return nil
