@@ -30,7 +30,7 @@ func stringifyExpr(expr ast.Expr) string {
 	case *ast.Ellipsis:
 		return stringifyEllipsis(x)
 	case *ast.FuncLit:
-		// TODO
+		return stringifyFuncLit(x)
 	case *ast.BinaryExpr:
 		return stringifyBinaryExpr(x)
 	case *ast.SliceExpr:
@@ -92,6 +92,20 @@ func stringifyArrayType(expr *ast.ArrayType) string {
 
 func stringifyEllipsis(expr *ast.Ellipsis) string {
 	return fmt.Sprintf("...%s", stringifyExpr(expr.Elt))
+}
+
+func stringifyFuncLit(expr *ast.FuncLit) string {
+	sb := new(strings.Builder)
+	sb.WriteString(stringifyFuncType(expr.Type))
+
+	// body
+	sb.WriteString("{")
+	for _, stmt := range expr.Body.List {
+		sb.WriteString(stringifyStmt(stmt))
+	}
+	sb.WriteString("}")
+
+	return sb.String()
 }
 
 func stringifyBinaryExpr(expr *ast.BinaryExpr) string {
@@ -218,58 +232,9 @@ func stringifyStructType(expr *ast.StructType) string {
 func stringifyFuncType(expr *ast.FuncType) string {
 	sb := new(strings.Builder)
 
-	sb.WriteString("func(")
-
-	// args
-	for i, arg := range expr.Params.List {
-		if i > 0 {
-			sb.WriteString(",")
-		}
-		for j, name := range arg.Names {
-			if j > 0 {
-				sb.WriteString(",")
-			}
-			sb.WriteString(name.Name)
-		}
-		sb.WriteString(" ")
-		sb.WriteString(stringifyExpr(arg.Type))
-	}
-	sb.WriteString(")")
-
-	// result
-	if expr.Results != nil {
-		rb := new(strings.Builder)
-
-		needParens := false
-		if len(expr.Results.List) > 1 {
-			needParens = true
-		}
-
-		for i, rslt := range expr.Results.List {
-			if i > 0 {
-				rb.WriteString(",")
-			}
-
-			for j, name := range rslt.Names {
-				needParens = true
-				if j > 0 {
-					rb.WriteString(",")
-				}
-				rb.WriteString(name.Name)
-				rb.WriteString(" ")
-			}
-
-			rb.WriteString(stringifyExpr(rslt.Type))
-		}
-
-		if needParens {
-			sb.WriteString("(")
-		}
-		sb.WriteString(rb.String())
-		if needParens {
-			sb.WriteString(")")
-		}
-	}
+	sb.WriteString("func")
+	sb.WriteString(stringifyFuncParams(expr.Params))
+	sb.WriteString(stringifyFuncResults(expr.Results))
 
 	return sb.String()
 }
