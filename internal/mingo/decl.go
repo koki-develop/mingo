@@ -47,10 +47,12 @@ func stringifyGenDecl(n *ast.GenDecl) string {
 
 func stringifyImportSpecs(specs []*ast.ImportSpec) string {
 	sb := new(strings.Builder)
-	sb.WriteString("import ")
+	sb.WriteString("import")
 
 	if len(specs) > 1 {
 		sb.WriteString("(")
+	} else {
+		sb.WriteString(" ")
 	}
 
 	for i, n := range specs {
