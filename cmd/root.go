@@ -20,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Long:  "Go language also wants to be minified.",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		for i, file := range args {
+		for _, file := range args {
 			err := filepath.WalkDir(file, func(path string, d os.DirEntry, err error) error {
 				if err != nil {
 					return err
@@ -50,11 +50,6 @@ var rootCmd = &cobra.Command{
 					out = f
 				} else {
 					out = os.Stdout
-					if i > 0 {
-						if _, err := fmt.Fprintln(out); err != nil {
-							return err
-						}
-					}
 				}
 
 				min, err := mingo.Minify(path, src)
@@ -62,8 +57,14 @@ var rootCmd = &cobra.Command{
 					return err
 				}
 
-				if _, err := fmt.Fprint(out, min); err != nil {
-					return err
+				if flagWrite {
+					if _, err := fmt.Fprint(out, min); err != nil {
+						return err
+					}
+				} else {
+					if _, err := fmt.Fprintln(out, min); err != nil {
+						return err
+					}
 				}
 
 				return nil
