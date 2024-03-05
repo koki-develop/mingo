@@ -71,6 +71,7 @@ func stringifyBasicLit(lit *ast.BasicLit) string {
 func stringifyCallExpr(expr *ast.CallExpr) string {
 	sb := new(strings.Builder)
 
+	fmt.Printf("expr.Fun: %T\n", expr.Fun)
 	sb.WriteString(stringifyExpr(expr.Fun))
 	sb.WriteString("(")
 	for i, arg := range expr.Args {
@@ -98,7 +99,6 @@ func stringifyEllipsis(expr *ast.Ellipsis) string {
 
 func stringifyFuncLit(expr *ast.FuncLit) string {
 	sb := new(strings.Builder)
-	sb.WriteString("func")
 	sb.WriteString(stringifyFuncType(expr.Type))
 	sb.WriteString(stringifyBlockStmt(expr.Body))
 
