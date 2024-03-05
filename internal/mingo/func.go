@@ -32,8 +32,28 @@ func stringifyFuncTypeParams(params *ast.FieldList) string {
 	if params == nil {
 		return ""
 	}
-	// TODO
-	return ""
+
+	sb := new(strings.Builder)
+
+	sb.WriteString("[")
+	for i, param := range params.List {
+		if i > 0 {
+			sb.WriteString(",")
+		}
+		for j, name := range param.Names {
+			if j > 0 {
+				sb.WriteString(",")
+			}
+			sb.WriteString(name.Name)
+		}
+		if len(param.Names) > 0 {
+			sb.WriteString(" ")
+		}
+		sb.WriteString(stringifyExpr(param.Type))
+	}
+	sb.WriteString("]")
+
+	return sb.String()
 }
 
 func stringifyFuncParams(params *ast.FieldList) string {
