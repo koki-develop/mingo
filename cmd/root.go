@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -39,7 +38,11 @@ var rootCmd = &cobra.Command{
 					return err
 				}
 
-				var out io.Writer
+				min, err := mingo.Minify(path, src)
+				if err != nil {
+					return err
+				}
+
 				if flagWrite {
 					f, err := os.Create(path)
 					if err != nil {
@@ -47,22 +50,11 @@ var rootCmd = &cobra.Command{
 					}
 					defer f.Close()
 
-					out = f
-				} else {
-					out = os.Stdout
-				}
-
-				min, err := mingo.Minify(path, src)
-				if err != nil {
-					return err
-				}
-
-				if flagWrite {
-					if _, err := fmt.Fprint(out, min); err != nil {
+					if _, err := fmt.Fprint(f, min); err != nil {
 						return err
 					}
 				} else {
-					if _, err := fmt.Fprintln(out, min); err != nil {
+					if _, err := fmt.Fprintln(os.Stdout, min); err != nil {
 						return err
 					}
 				}
