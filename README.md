@@ -2,7 +2,6 @@
 
 <p align="center">
 <a href="https://github.com/koki-develop/mingo/releases/latest"><img src="https://img.shields.io/github/v/release/koki-develop/mingo" alt="GitHub release (latest by date)"></a>
-<a href="https://github.com/koki-develop/mingo/releases/latest"><img alt="GitHub all releases" src="https://img.shields.io/github/downloads/koki-develop/mingo/total?style=flat"></a>
 <a href="https://github.com/koki-develop/mingo/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/koki-develop/mingo/ci.yml?logo=github" alt="GitHub Workflow Status"></a>
 <a href="https://goreportcard.com/report/github.com/koki-develop/mingo"><img src="https://goreportcard.com/badge/github.com/koki-develop/mingo" alt="Go Report Card"></a>
 <a href="./LICENSE"><img src="https://img.shields.io/github/license/koki-develop/mingo" alt="LICENSE"></a>
