@@ -83,6 +83,7 @@ func main() {
 			assert.NoError(t, err)
 			assert.Equal(t, tc.want, got)
 
+			// check syntax
 			_, err = format.Source([]byte(got))
 			assert.NoError(t, err)
 		})
