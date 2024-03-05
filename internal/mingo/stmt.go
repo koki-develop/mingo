@@ -224,15 +224,15 @@ func stringifyForStmt(stmt *ast.ForStmt) string {
 
 	if stmt.Init != nil {
 		sb.WriteString(stringifyStmt(stmt.Init))
-		if stmt.Cond != nil || stmt.Post != nil {
-			sb.WriteString(";")
-		}
+	}
+	if stmt.Init != nil || stmt.Post != nil {
+		sb.WriteString(";")
 	}
 	if stmt.Cond != nil {
 		sb.WriteString(stringifyExpr(stmt.Cond))
-		if stmt.Post != nil {
-			sb.WriteString(";")
-		}
+	}
+	if stmt.Init != nil || stmt.Post != nil {
+		sb.WriteString(";")
 	}
 	if stmt.Post != nil {
 		sb.WriteString(stringifyStmt(stmt.Post))

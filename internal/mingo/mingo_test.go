@@ -321,6 +321,48 @@ func main() {
 `,
 			want: `package main;var(A=1;B int=2;C,D int=3,4;E,F,G=3,4,5);var w=1;var x int=2;var y,z=3,4;func main(){var a int=1;var b,c int=2,3;var(d=4;e=5);};`,
 		},
+		{
+			name: "for",
+			src: `package main
+
+func main() {
+	for {
+		break
+	}
+
+	for i := 0; i < 10; i++ {
+		println(i)
+	}
+
+	for i := 0; i < 10; {
+		println(i)
+		i++
+	}
+
+	for i := 0; ; i++ {
+		if i >= 10 {
+			break
+		}
+		println(i)
+	}
+
+	i := 0
+	for ; i < 10; i++ {
+		println(i)
+	}
+
+	for ; i < 20; {
+		println(i)
+		i++
+	}
+
+	for true {
+		break
+	}
+}
+`,
+			want: `package main;func main(){for {break};for i:=0;i<10;i++{println(i)};for i:=0;i<10;{println(i);i++};for i:=0;;i++{if i>=10{break};println(i)};i:=0;for ;i<10;i++{println(i)};for i<20{println(i);i++};for true{break}};`,
+		},
 	}
 
 	for _, tc := range testcases {
