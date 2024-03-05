@@ -16,15 +16,16 @@ func MinifyFile(filename string) (string, error) {
 		return "", err
 	}
 
-	fmted, err := format.Source(src)
-	if err != nil {
-		return "", err
-	}
-
-	return Minify(filename, fmted)
+	return Minify(filename, src)
 }
 
 func Minify(filename string, src []byte) (string, error) {
+	if s, err := format.Source(src); err != nil {
+		return "", err
+	} else {
+		src = s
+	}
+
 	fset := token.NewFileSet()
 
 	file, err := parser.ParseFile(fset, filename, string(src), 0)
