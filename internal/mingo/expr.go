@@ -33,28 +33,15 @@ func stringifyExpr(expr ast.Expr) string {
 		sb.WriteString(")")
 	case *ast.SelectorExpr:
 		sb.WriteString(stringifySelectExpr(x))
-	default:
-		// fmt.Printf("expr: %#v\n", x)
-		// sb.WriteString(x.(*ast.Ident).Name)
-	}
-
-	return sb.String()
-}
-func stringifyArgType(t ast.Expr) string {
-	sb := new(strings.Builder)
-
-	switch x := t.(type) {
 	case *ast.StarExpr:
 		sb.WriteString("*")
-		sb.WriteString(stringifyArgType(x.X))
+		sb.WriteString(stringifyExpr(x.X))
 	case *ast.ArrayType:
 		sb.WriteString("[]")
-		sb.WriteString(stringifyArgType(x.Elt))
-	case *ast.SelectorExpr:
-		sb.WriteString(stringifySelectExpr(x))
+		sb.WriteString(stringifyExpr(x.Elt))
 	case *ast.Ellipsis:
 		sb.WriteString("...")
-		sb.WriteString(stringifyArgType(x.Elt))
+		sb.WriteString(stringifyExpr(x.Elt))
 	default:
 		sb.WriteString(x.(*ast.Ident).Name)
 	}

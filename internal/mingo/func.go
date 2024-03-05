@@ -30,7 +30,7 @@ func minifyFuncDecl(n *ast.FuncDecl) string {
 		}
 
 		sb.WriteString(" ")
-		sb.WriteString(stringifyArgType(arg.Type))
+		sb.WriteString(stringifyExpr(arg.Type))
 	}
 	sb.WriteString(")")
 
@@ -57,7 +57,7 @@ func minifyFuncDecl(n *ast.FuncDecl) string {
 				rb.WriteString(" ")
 			}
 
-			rb.WriteString(stringifyArgType(rslt.Type))
+			rb.WriteString(stringifyExpr(rslt.Type))
 		}
 
 		if needParens {
