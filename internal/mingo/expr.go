@@ -6,15 +6,6 @@ import (
 	"strings"
 )
 
-func stringifySelectExpr(expr *ast.SelectorExpr) string {
-	switch x := expr.X.(type) {
-	case *ast.SelectorExpr:
-		return fmt.Sprintf("%s.%s", stringifySelectExpr(x), expr.Sel.Name)
-	default:
-		return fmt.Sprintf("%s.%s", x.(*ast.Ident).Name, expr.Sel.Name)
-	}
-}
-
 func stringifyExpr(expr ast.Expr) string {
 	switch x := expr.(type) {
 	case *ast.BasicLit:
@@ -57,9 +48,20 @@ func stringifyExpr(expr ast.Expr) string {
 		return stringifyStructType(x)
 	case *ast.FuncType:
 		return stringifyFuncType(x)
+	case nil:
+		return ""
 	}
 
 	return expr.(*ast.Ident).Name
+}
+
+func stringifySelectExpr(expr *ast.SelectorExpr) string {
+	switch x := expr.X.(type) {
+	case *ast.SelectorExpr:
+		return fmt.Sprintf("%s.%s", stringifySelectExpr(x), expr.Sel.Name)
+	default:
+		return fmt.Sprintf("%s.%s", stringifyExpr(expr.X), expr.Sel.Name)
+	}
 }
 
 func stringifyBasicLit(lit *ast.BasicLit) string {
@@ -96,14 +98,9 @@ func stringifyEllipsis(expr *ast.Ellipsis) string {
 
 func stringifyFuncLit(expr *ast.FuncLit) string {
 	sb := new(strings.Builder)
+	sb.WriteString("func")
 	sb.WriteString(stringifyFuncType(expr.Type))
-
-	// body
-	sb.WriteString("{")
-	for _, stmt := range expr.Body.List {
-		sb.WriteString(stringifyStmt(stmt))
-	}
-	sb.WriteString("}")
+	sb.WriteString(stringifyBlockStmt(expr.Body))
 
 	return sb.String()
 }
@@ -166,7 +163,11 @@ func stringifyKeyValueExpr(expr *ast.KeyValueExpr) string {
 }
 
 func stringifyTypeAssertExpr(expr *ast.TypeAssertExpr) string {
-	return fmt.Sprintf("%s.(%s)", stringifyExpr(expr.X), stringifyExpr(expr.Type))
+	if expr.Type == nil {
+		return fmt.Sprintf("%s.(type)", stringifyExpr(expr.X))
+	} else {
+		return fmt.Sprintf("%s.(%s)", stringifyExpr(expr.X), stringifyExpr(expr.Type))
+	}
 }
 
 func stringifyChanType(expr *ast.ChanType) string {
@@ -193,13 +194,9 @@ func stringifyInterfaceType(expr *ast.InterfaceType) string {
 		if i > 0 {
 			sb.WriteString(";")
 		}
-		for j, name := range field.Names {
-			if j > 0 {
-				sb.WriteString(",")
-			}
+		for _, name := range field.Names {
 			sb.WriteString(name.Name)
 		}
-		sb.WriteString(" ")
 		sb.WriteString(stringifyExpr(field.Type))
 	}
 	sb.WriteString("}")
@@ -221,7 +218,12 @@ func stringifyStructType(expr *ast.StructType) string {
 			}
 			sb.WriteString(name.Name)
 		}
-		sb.WriteString(" ")
+		if len(field.Names) > 0 {
+			sb.WriteString(" ")
+		}
+		if _, ok := field.Type.(*ast.FuncType); ok {
+			sb.WriteString("func")
+		}
 		sb.WriteString(stringifyExpr(field.Type))
 	}
 	sb.WriteString("}")
@@ -233,6 +235,7 @@ func stringifyFuncType(expr *ast.FuncType) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("func")
+	sb.WriteString(stringifyFuncTypeParams(expr.TypeParams))
 	sb.WriteString(stringifyFuncParams(expr.Params))
 	sb.WriteString(stringifyFuncResults(expr.Results))
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func minifyFuncDecl(n *ast.FuncDecl) string {
+func stringifyFuncDecl(n *ast.FuncDecl) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("func")
@@ -19,22 +19,21 @@ func minifyFuncDecl(n *ast.FuncDecl) string {
 
 	fmt.Fprintf(sb, "%s", n.Name.Name)
 
-	// args
+	sb.WriteString(stringifyFuncTypeParams(n.Type.TypeParams))
 	sb.WriteString(stringifyFuncParams(n.Type.Params))
-
-	// result
 	sb.WriteString(stringifyFuncResults(n.Type.Results))
-
-	// body
-	sb.WriteString("{")
-	for _, stmt := range n.Body.List {
-		sb.WriteString(stringifyStmt(stmt))
-	}
-	sb.WriteString("}")
+	sb.WriteString(stringifyBlockStmt(n.Body))
 
 	sb.WriteString(";")
-	sb.WriteString("\n") // TODO: remove
 	return sb.String()
+}
+
+func stringifyFuncTypeParams(params *ast.FieldList) string {
+	if params == nil {
+		return ""
+	}
+	// TODO
+	return ""
 }
 
 func stringifyFuncParams(params *ast.FieldList) string {

@@ -3,6 +3,7 @@ package mingo
 import (
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"os"
@@ -15,7 +16,12 @@ func MinifyFile(filename string) (string, error) {
 		return "", err
 	}
 
-	return Minify(filename, src)
+	fmted, err := format.Source(src)
+	if err != nil {
+		return "", err
+	}
+
+	return Minify(filename, fmted)
 }
 
 func Minify(filename string, src []byte) (string, error) {
@@ -32,13 +38,9 @@ func Minify(filename string, src []byte) (string, error) {
 		case *ast.File:
 			fmt.Fprint(sb, minifyFile(x))
 		case *ast.GenDecl:
-			fmt.Fprint(sb, minifyGenDecl(x))
+			fmt.Fprint(sb, stringifyGenDecl(x))
 		case *ast.FuncDecl:
-			fmt.Fprint(sb, minifyFuncDecl(x))
-		case *ast.Ident, *ast.BasicLit, *ast.ImportSpec, nil:
-			// pass
-		default:
-			// fmt.Printf("%#v\n", x)
+			fmt.Fprint(sb, stringifyFuncDecl(x))
 		}
 		return true
 	})

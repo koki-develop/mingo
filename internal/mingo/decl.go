@@ -7,26 +7,41 @@ import (
 	"strings"
 )
 
-func minifyGenDecl(n *ast.GenDecl) string {
+func stringifyDecl(decl ast.Decl) string {
+	switch x := decl.(type) {
+	case *ast.GenDecl:
+		return stringifyGenDecl(x)
+	case *ast.FuncDecl:
+		return stringifyFuncDecl(x)
+	}
+	return ""
+}
+
+func stringifyGenDecl(n *ast.GenDecl) string {
 	switch n.Tok {
 	case token.IMPORT:
 		imports := []*ast.ImportSpec{}
 		for _, spec := range n.Specs {
 			imports = append(imports, spec.(*ast.ImportSpec))
 		}
-		return minifyImportSpecs(imports)
-	case token.TYPE:
-		// TODO
+		return stringifyImportSpecs(imports)
 	case token.CONST:
 		// TODO
 	case token.VAR:
 		// TODO
+	case token.TYPE:
+		sb := new(strings.Builder)
+		for _, spec := range n.Specs {
+			sb.WriteString(stringifyTypeSpec(spec.(*ast.TypeSpec)))
+			sb.WriteString(";")
+		}
+		return sb.String()
 	}
 
 	return ""
 }
 
-func minifyImportSpecs(ns []*ast.ImportSpec) string {
+func stringifyImportSpecs(ns []*ast.ImportSpec) string {
 	sb := new(strings.Builder)
 	sb.WriteString("import ")
 
@@ -50,4 +65,8 @@ func minifyImportSpecs(ns []*ast.ImportSpec) string {
 	}
 	sb.WriteString(";")
 	return sb.String()
+}
+
+func stringifyTypeSpec(n *ast.TypeSpec) string {
+	return fmt.Sprintf("type %s %s", n.Name.Name, stringifyExpr(n.Type))
 }
