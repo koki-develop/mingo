@@ -6,18 +6,8 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"os"
 	"strings"
 )
-
-func MinifyFile(filename string) (string, error) {
-	src, err := os.ReadFile(filename)
-	if err != nil {
-		return "", err
-	}
-
-	return Minify(filename, src)
-}
 
 func Minify(filename string, src []byte) (string, error) {
 	if s, err := format.Source(src); err != nil {
