@@ -391,6 +391,24 @@ func main() {
 `,
 			want: `package main;func main(){for range 10{break};for i:=range 10{println(i)};for _,s:=range []string{"a","b","c"}{println(s)};for i,s:=range []string{"a","b","c"}{println(i,s)};for i:=range []string{"a","b","c"}{println(i)}};`,
 		},
+		{
+			name: "slice",
+			src: `package main
+
+import "fmt"
+
+func main() {
+	s := []string{"A", "B", "C"}
+
+	fmt.Println(s[0])
+	fmt.Println(s[0:1])
+	fmt.Println(s[0:])
+	fmt.Println(s[:1])
+	fmt.Println(s[:])
+}
+`,
+			want: `package main;import "fmt";func main(){s:=[]string{"A","B","C"};fmt.Println(s[0]);fmt.Println(s[0:1]);fmt.Println(s[0:]);fmt.Println(s[:1]);fmt.Println(s[:])};`,
+		},
 	}
 
 	for _, tc := range testcases {
