@@ -221,9 +221,6 @@ func stringifyStructType(expr *ast.StructType) string {
 		if len(field.Names) > 0 {
 			sb.WriteString(" ")
 		}
-		if _, ok := field.Type.(*ast.FuncType); ok {
-			sb.WriteString("func")
-		}
 		sb.WriteString(stringifyExpr(field.Type))
 	}
 	sb.WriteString("}")
