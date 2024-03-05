@@ -183,6 +183,34 @@ func main() {
 `,
 			want: `package main;import ("fmt";"time");func hello(){fmt.Println("Hello, 世界");time.Sleep(1*time.Second)};func main(){go func(){fmt.Println("Hello, 世界");time.Sleep(1*time.Second)}();go hello()};`,
 		},
+		{
+			name: "func",
+			src: `package main
+
+import "fmt"
+
+func hello() {
+	func() {
+		fmt.Println("Hello")
+	}()
+
+	func(s string) {
+		fmt.Printf("Hello, %s\n", s)
+	}("world")
+
+	if err := func() error {
+		return nil
+	}(); err != nil {
+		fmt.Println(err)
+	}
+}
+
+func main() {
+	go hello()
+}
+`,
+			want: `package main;import "fmt";func hello(){func(){fmt.Println("Hello")}();func(s string){fmt.Printf("Hello, %s\n",s)}("world");if err:=func()error{return nil}();err!=nil{fmt.Println(err)}};func main(){go hello()};`,
+		},
 	}
 
 	for _, tc := range testcases {

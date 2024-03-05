@@ -71,7 +71,6 @@ func stringifyBasicLit(lit *ast.BasicLit) string {
 func stringifyCallExpr(expr *ast.CallExpr) string {
 	sb := new(strings.Builder)
 
-	fmt.Printf("expr.Fun: %T\n", expr.Fun)
 	sb.WriteString(stringifyExpr(expr.Fun))
 	sb.WriteString("(")
 	for i, arg := range expr.Args {
