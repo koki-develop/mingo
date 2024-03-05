@@ -15,7 +15,10 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "mingo",
+	Use:   "mingo [flags] [files]...",
+	Short: "Go language also wants to be minified",
+	Long:  "Go language also wants to be minified.",
+	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for i, file := range args {
 			err := filepath.WalkDir(file, func(path string, d os.DirEntry, err error) error {
