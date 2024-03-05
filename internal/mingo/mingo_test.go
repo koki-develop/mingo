@@ -251,6 +251,34 @@ func main() {
 `,
 			want: `package main;import "fmt";func Ptr[T any](p T)*T{return &p};func Equals[T,U comparable](t T,u U)bool{return t==u};func Hoge[T comparable,U fmt.Stringer](s []T,e U)bool{return true};func main(){fmt.Println(Ptr(1))};`,
 		},
+		{
+			name: "const",
+			src: `package main
+
+const (
+	A       = 1
+	B       = 2
+	C, D, E = 3, 4, 5
+)
+
+const (
+	_ = iota
+	a
+	b
+	c
+)
+
+func main() {
+	const a = 1
+	const b, c = 2, 3
+	const (
+		d = 4
+		e = 5
+	)
+}
+`,
+			want: `package main;const (A=1;B=2;C=3,4,5;D=3,4,5;E=3,4,5);const (_=iota;a;b;c);func main(){const a=1;;const b=2,3;c=2,3;;const (d=4;e=5);};`,
+		},
 	}
 
 	for _, tc := range testcases {

@@ -26,7 +26,11 @@ func stringifyGenDecl(n *ast.GenDecl) string {
 		}
 		return stringifyImportSpecs(imports)
 	case token.CONST:
-		// TODO
+		consts := []*ast.ValueSpec{}
+		for _, spec := range n.Specs {
+			consts = append(consts, spec.(*ast.ValueSpec))
+		}
+		return stringifyConstSpecs(consts)
 	case token.VAR:
 		// TODO
 	case token.TYPE:
@@ -41,15 +45,15 @@ func stringifyGenDecl(n *ast.GenDecl) string {
 	return ""
 }
 
-func stringifyImportSpecs(ns []*ast.ImportSpec) string {
+func stringifyImportSpecs(specs []*ast.ImportSpec) string {
 	sb := new(strings.Builder)
 	sb.WriteString("import ")
 
-	if len(ns) > 1 {
+	if len(specs) > 1 {
 		sb.WriteString("(")
 	}
 
-	for i, n := range ns {
+	for i, n := range specs {
 		if i > 0 {
 			sb.WriteString(";")
 		}
@@ -60,7 +64,44 @@ func stringifyImportSpecs(ns []*ast.ImportSpec) string {
 		}
 	}
 
-	if len(ns) > 1 {
+	if len(specs) > 1 {
+		sb.WriteString(")")
+	}
+	sb.WriteString(";")
+	return sb.String()
+}
+
+func stringifyConstSpecs(specs []*ast.ValueSpec) string {
+	sb := new(strings.Builder)
+	sb.WriteString("const ")
+
+	if len(specs) > 1 {
+		sb.WriteString("(")
+	}
+
+	for i, spec := range specs {
+		if i > 0 {
+			sb.WriteString(";")
+		}
+		for j, name := range spec.Names {
+			if j > 0 {
+				sb.WriteString(";")
+			}
+			sb.WriteString(name.Name)
+
+			if spec.Values != nil {
+				sb.WriteString("=")
+				for k, value := range spec.Values {
+					if k > 0 {
+						sb.WriteString(",")
+					}
+					sb.WriteString(stringifyExpr(value))
+				}
+			}
+		}
+	}
+
+	if len(specs) > 1 {
 		sb.WriteString(")")
 	}
 	sb.WriteString(";")

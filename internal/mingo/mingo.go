@@ -37,12 +37,15 @@ func Minify(filename string, src []byte) (string, error) {
 		switch x := n.(type) {
 		case *ast.File:
 			fmt.Fprint(sb, minifyFile(x))
+			return true
 		case *ast.GenDecl:
 			fmt.Fprint(sb, stringifyGenDecl(x))
+			return true
 		case *ast.FuncDecl:
 			fmt.Fprint(sb, stringifyFuncDecl(x))
+			return true
 		}
-		return true
+		return false
 	})
 
 	return sb.String(), nil
