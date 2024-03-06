@@ -60,6 +60,7 @@ func stringifyExpr(expr ast.Expr) string {
 func stringifyIndexListExpr(expr *ast.IndexListExpr) string {
 	sb := new(strings.Builder)
 
+	sb.WriteString(stringifyExpr(expr.X))
 	sb.WriteString("[")
 	for i, index := range expr.Indices {
 		if i > 0 {
