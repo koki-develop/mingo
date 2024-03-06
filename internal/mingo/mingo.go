@@ -27,7 +27,7 @@ func Minify(filename string, src []byte) (string, error) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		switch x := n.(type) {
 		case *ast.File:
-			fmt.Fprint(sb, minifyFile(x))
+			fmt.Fprint(sb, stringifyFile(x))
 			return true
 		case *ast.GenDecl:
 			fmt.Fprint(sb, stringifyGenDecl(x))
@@ -42,6 +42,6 @@ func Minify(filename string, src []byte) (string, error) {
 	return sb.String(), nil
 }
 
-func minifyFile(n *ast.File) string {
+func stringifyFile(n *ast.File) string {
 	return fmt.Sprintf("package %s;", n.Name.Name)
 }
