@@ -33,6 +33,10 @@ var rootCmd = &cobra.Command{
 					return nil
 				}
 
+				if flagWrite {
+					fmt.Println(path)
+				}
+
 				src, err := os.ReadFile(path)
 				if err != nil {
 					return err
