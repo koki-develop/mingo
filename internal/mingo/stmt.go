@@ -199,6 +199,7 @@ func stringifySwitchStmt(stmt *ast.SwitchStmt) string {
 	sb.WriteString("switch ")
 	if stmt.Init != nil {
 		sb.WriteString(stringifyStmt(stmt.Init))
+		sb.WriteString(";")
 	}
 	if stmt.Tag != nil {
 		sb.WriteString(stringifyExpr(stmt.Tag))
@@ -347,6 +348,7 @@ func stringifyTypeSwitchStmt(stmt *ast.TypeSwitchStmt) string {
 	sb.WriteString("switch ")
 	if stmt.Init != nil {
 		sb.WriteString(stringifyStmt(stmt.Init))
+		sb.WriteString(";")
 	}
 	if stmt.Assign != nil {
 		sb.WriteString(stringifyStmt(stmt.Assign))
