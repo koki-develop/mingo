@@ -97,6 +97,11 @@ func stringifyCallExpr(expr *ast.CallExpr) string {
 		}
 		sb.WriteString(stringifyExpr(arg))
 	}
+
+	if expr.Ellipsis.IsValid() {
+		sb.WriteString("...")
+	}
+
 	sb.WriteString(")")
 
 	return sb.String()
