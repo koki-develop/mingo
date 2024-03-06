@@ -41,7 +41,3 @@ func Minify(filename string, src []byte) (string, error) {
 
 	return sb.String(), nil
 }
-
-func stringifyFile(n *ast.File) string {
-	return fmt.Sprintf("package %s;", n.Name.Name)
-}
