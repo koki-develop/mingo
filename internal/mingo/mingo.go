@@ -25,12 +25,21 @@ type mingo struct {
 }
 
 func (m *mingo) Minify(filename string, src []byte) (string, error) {
-	file, err := parser.ParseFile(m.fileSet, filename, string(src), 0)
+	file, err := parser.ParseFile(m.fileSet, filename, string(src), parser.ParseComments)
 	if err != nil {
 		return "", err
 	}
 
 	sb := new(strings.Builder)
+
+	for _, cg := range file.Comments {
+		for _, c := range cg.List {
+			if strings.HasPrefix(c.Text, "//go:generate ") {
+				fmt.Fprintln(sb, c.Text)
+			}
+		}
+	}
+
 	fmt.Fprint(sb, m.stringifyFile(file))
 	for _, decl := range file.Decls {
 		fmt.Fprint(sb, m.stringifyDecl(decl))
