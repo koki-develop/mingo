@@ -2,7 +2,6 @@ package mingo
 
 import (
 	"fmt"
-	"go/ast"
 	"go/format"
 	"go/parser"
 	"go/token"
@@ -32,20 +31,10 @@ func (m *mingo) Minify(filename string, src []byte) (string, error) {
 	}
 
 	sb := new(strings.Builder)
-	ast.Inspect(file, func(n ast.Node) bool {
-		switch x := n.(type) {
-		case *ast.File:
-			fmt.Fprint(sb, m.stringifyFile(x))
-			return true
-		case *ast.GenDecl:
-			fmt.Fprint(sb, m.stringifyGenDecl(x))
-			return true
-		case *ast.FuncDecl:
-			fmt.Fprint(sb, m.stringifyFuncDecl(x))
-			return true
-		}
-		return false
-	})
+	fmt.Fprint(sb, m.stringifyFile(file))
+	for _, decl := range file.Decls {
+		fmt.Fprint(sb, m.stringifyDecl(decl))
+	}
 
 	return sb.String(), nil
 }
