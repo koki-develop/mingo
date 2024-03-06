@@ -110,6 +110,15 @@ func (m *mingo) stringifyConstDecl(decl *ast.GenDecl) string {
 
 func (m *mingo) stringifyVarDecl(decl *ast.GenDecl) string {
 	sb := new(strings.Builder)
+
+	if decl.Doc != nil {
+		for _, cmt := range decl.Doc.List {
+			if strings.HasPrefix(cmt.Text, "//go:embed ") {
+				fmt.Fprintf(sb, "\n%s\n", cmt.Text)
+			}
+		}
+	}
+
 	sb.WriteString("var")
 
 	if len(decl.Specs) > 1 {
@@ -127,6 +136,14 @@ func (m *mingo) stringifyVarDecl(decl *ast.GenDecl) string {
 		for j, name := range spec.Names {
 			if j > 0 {
 				sb.WriteString(",")
+			}
+
+			if spec.Doc != nil {
+				for _, cmt := range spec.Doc.List {
+					if strings.HasPrefix(cmt.Text, "//go:embed ") {
+						fmt.Fprintf(sb, "\n%s\n", cmt.Text)
+					}
+				}
 			}
 			sb.WriteString(name.Name)
 		}
