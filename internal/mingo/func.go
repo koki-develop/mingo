@@ -6,29 +6,29 @@ import (
 	"strings"
 )
 
-func stringifyFuncDecl(n *ast.FuncDecl) string {
+func (m *mingo) stringifyFuncDecl(n *ast.FuncDecl) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("func")
 
 	if n.Recv != nil {
-		sb.WriteString(stringifyFuncParams(n.Recv))
+		sb.WriteString(m.stringifyFuncParams(n.Recv))
 	} else {
 		sb.WriteString(" ")
 	}
 
 	fmt.Fprintf(sb, "%s", n.Name.Name)
 
-	sb.WriteString(stringifyFuncTypeParams(n.Type.TypeParams))
-	sb.WriteString(stringifyFuncParams(n.Type.Params))
-	sb.WriteString(stringifyFuncResults(n.Type.Results))
-	sb.WriteString(stringifyBlockStmt(n.Body))
+	sb.WriteString(m.stringifyFuncTypeParams(n.Type.TypeParams))
+	sb.WriteString(m.stringifyFuncParams(n.Type.Params))
+	sb.WriteString(m.stringifyFuncResults(n.Type.Results))
+	sb.WriteString(m.stringifyBlockStmt(n.Body))
 
 	sb.WriteString(";")
 	return sb.String()
 }
 
-func stringifyFuncTypeParams(params *ast.FieldList) string {
+func (m *mingo) stringifyFuncTypeParams(params *ast.FieldList) string {
 	if params == nil {
 		return ""
 	}
@@ -49,14 +49,14 @@ func stringifyFuncTypeParams(params *ast.FieldList) string {
 		if len(param.Names) > 0 {
 			sb.WriteString(" ")
 		}
-		sb.WriteString(stringifyExpr(param.Type))
+		sb.WriteString(m.stringifyExpr(param.Type))
 	}
 	sb.WriteString("]")
 
 	return sb.String()
 }
 
-func stringifyFuncParams(params *ast.FieldList) string {
+func (m *mingo) stringifyFuncParams(params *ast.FieldList) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("(")
@@ -76,14 +76,14 @@ func stringifyFuncParams(params *ast.FieldList) string {
 			sb.WriteString(" ")
 		}
 
-		sb.WriteString(stringifyExpr(arg.Type))
+		sb.WriteString(m.stringifyExpr(arg.Type))
 	}
 
 	sb.WriteString(")")
 	return sb.String()
 }
 
-func stringifyFuncResults(results *ast.FieldList) string {
+func (m *mingo) stringifyFuncResults(results *ast.FieldList) string {
 	if results == nil {
 		return ""
 	}
@@ -110,7 +110,7 @@ func stringifyFuncResults(results *ast.FieldList) string {
 			rb.WriteString(" ")
 		}
 
-		rb.WriteString(stringifyExpr(rslt.Type))
+		rb.WriteString(m.stringifyExpr(rslt.Type))
 	}
 
 	if needParens {

@@ -5,6 +5,6 @@ import (
 	"go/ast"
 )
 
-func stringifyFile(n *ast.File) string {
+func (m *mingo) stringifyFile(n *ast.File) string {
 	return fmt.Sprintf("package %s;", n.Name.Name)
 }

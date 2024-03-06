@@ -35,13 +35,13 @@ func (m *mingo) Minify(filename string, src []byte) (string, error) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		switch x := n.(type) {
 		case *ast.File:
-			fmt.Fprint(sb, stringifyFile(x))
+			fmt.Fprint(sb, m.stringifyFile(x))
 			return true
 		case *ast.GenDecl:
-			fmt.Fprint(sb, stringifyGenDecl(x))
+			fmt.Fprint(sb, m.stringifyGenDecl(x))
 			return true
 		case *ast.FuncDecl:
-			fmt.Fprint(sb, stringifyFuncDecl(x))
+			fmt.Fprint(sb, m.stringifyFuncDecl(x))
 			return true
 		}
 		return false

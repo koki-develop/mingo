@@ -7,59 +7,59 @@ import (
 	"strings"
 )
 
-func stringifyStmt(stmt ast.Stmt) string {
+func (m *mingo) stringifyStmt(stmt ast.Stmt) string {
 	switch x := stmt.(type) {
 	case *ast.ReturnStmt:
-		return stringifyReturnStmt(x)
+		return m.stringifyReturnStmt(x)
 	case *ast.AssignStmt:
-		return stringifyAssignStmt(x)
+		return m.stringifyAssignStmt(x)
 	case *ast.IfStmt:
-		return stringifyIfStmt(x)
+		return m.stringifyIfStmt(x)
 	case *ast.BlockStmt:
-		return stringifyBlockStmt(x)
+		return m.stringifyBlockStmt(x)
 	case *ast.ExprStmt:
-		return stringifyExprStmt(x)
+		return m.stringifyExprStmt(x)
 	case *ast.DeclStmt:
-		return stringifyDeclStmt(x)
+		return m.stringifyDeclStmt(x)
 	case *ast.DeferStmt:
-		return stringifyDeferStmt(x)
+		return m.stringifyDeferStmt(x)
 	case *ast.GoStmt:
-		return stringifyGoStmt(x)
+		return m.stringifyGoStmt(x)
 	case *ast.LabeledStmt:
-		return stringifyLabeledStmt(x)
+		return m.stringifyLabeledStmt(x)
 	case *ast.SwitchStmt:
-		return stringifySwitchStmt(x)
+		return m.stringifySwitchStmt(x)
 	case *ast.SelectStmt:
-		return stringifySelectStmt(x)
+		return m.stringifySelectStmt(x)
 	case *ast.ForStmt:
-		return stringifyForStmt(x)
+		return m.stringifyForStmt(x)
 	case *ast.RangeStmt:
-		return stringifyRangeStmt(x)
+		return m.stringifyRangeStmt(x)
 	case *ast.BranchStmt:
-		return stringifyBranchStmt(x)
+		return m.stringifyBranchStmt(x)
 	case *ast.EmptyStmt:
-		return stringifyEmptyStmt(x)
+		return m.stringifyEmptyStmt(x)
 	case *ast.IncDecStmt:
-		return stringifyIncDecStmt(x)
+		return m.stringifyIncDecStmt(x)
 	case *ast.SendStmt:
-		return stringifySendStmt(x)
+		return m.stringifySendStmt(x)
 	case *ast.CaseClause:
-		return stringifyCaseCaluse(x)
+		return m.stringifyCaseCaluse(x)
 	case *ast.CommClause:
-		return stringifyCommClause(x)
+		return m.stringifyCommClause(x)
 	case *ast.TypeSwitchStmt:
-		return stringifyTypeSwitchStmt(x)
+		return m.stringifyTypeSwitchStmt(x)
 	default:
 		panic(fmt.Sprintf("unhandled stmt: %#v", x))
 	}
 }
 
-func stringifyBlockStmt(stmt *ast.BlockStmt) string {
+func (m *mingo) stringifyBlockStmt(stmt *ast.BlockStmt) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("{")
 	for i, child := range stmt.List {
-		sb.WriteString(stringifyStmt(child))
+		sb.WriteString(m.stringifyStmt(child))
 
 		if _, ok := child.(*ast.DeclStmt); !ok {
 			if i < len(stmt.List)-1 {
@@ -71,7 +71,7 @@ func stringifyBlockStmt(stmt *ast.BlockStmt) string {
 	return sb.String()
 }
 
-func stringifyReturnStmt(stmt *ast.ReturnStmt) string {
+func (m *mingo) stringifyReturnStmt(stmt *ast.ReturnStmt) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("return")
@@ -83,20 +83,20 @@ func stringifyReturnStmt(stmt *ast.ReturnStmt) string {
 		if i > 0 {
 			sb.WriteString(",")
 		}
-		sb.WriteString(stringifyExpr(expr))
+		sb.WriteString(m.stringifyExpr(expr))
 	}
 
 	return sb.String()
 }
 
-func stringifyAssignStmt(stmt *ast.AssignStmt) string {
+func (m *mingo) stringifyAssignStmt(stmt *ast.AssignStmt) string {
 	sb := new(strings.Builder)
 
 	for i, expr := range stmt.Lhs {
 		if i > 0 {
 			sb.WriteString(",")
 		}
-		sb.WriteString(stringifyExpr(expr))
+		sb.WriteString(m.stringifyExpr(expr))
 	}
 	if stmt.Tok == token.DEFINE {
 		sb.WriteString(":=")
@@ -107,155 +107,155 @@ func stringifyAssignStmt(stmt *ast.AssignStmt) string {
 		if i > 0 {
 			sb.WriteString(",")
 		}
-		sb.WriteString(stringifyExpr(expr))
+		sb.WriteString(m.stringifyExpr(expr))
 	}
 
 	return sb.String()
 }
 
-func stringifyIfStmt(stmt *ast.IfStmt) string {
+func (m *mingo) stringifyIfStmt(stmt *ast.IfStmt) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("if ")
-	sb.WriteString(stringifyIfStmtBody(stmt))
+	sb.WriteString(m.stringifyIfStmtBody(stmt))
 
 	return sb.String()
 }
 
-func stringifyElseIfStmt(stmt *ast.IfStmt) string {
+func (m *mingo) stringifyElseIfStmt(stmt *ast.IfStmt) string {
 	sb := new(strings.Builder)
 
 	sb.WriteString("else if ")
-	sb.WriteString(stringifyIfStmtBody(stmt))
+	sb.WriteString(m.stringifyIfStmtBody(stmt))
 
 	return sb.String()
 }
 
-func stringifyIfStmtBody(stmt *ast.IfStmt) string {
+func (m *mingo) stringifyIfStmtBody(stmt *ast.IfStmt) string {
 	sb := new(strings.Builder)
 
 	if stmt.Init != nil {
-		sb.WriteString(stringifyStmt(stmt.Init))
+		sb.WriteString(m.stringifyStmt(stmt.Init))
 		sb.WriteString(";")
 	}
 	if stmt.Cond != nil {
-		sb.WriteString(stringifyExpr(stmt.Cond))
+		sb.WriteString(m.stringifyExpr(stmt.Cond))
 	}
 	if stmt.Body != nil {
-		sb.WriteString(stringifyBlockStmt(stmt.Body))
+		sb.WriteString(m.stringifyBlockStmt(stmt.Body))
 	}
 	if stmt.Else != nil {
 		if ifstmt, ok := stmt.Else.(*ast.IfStmt); ok {
-			sb.WriteString(stringifyElseIfStmt(ifstmt))
+			sb.WriteString(m.stringifyElseIfStmt(ifstmt))
 		} else {
 			sb.WriteString("else")
-			sb.WriteString(stringifyStmt(stmt.Else))
+			sb.WriteString(m.stringifyStmt(stmt.Else))
 		}
 	}
 
 	return sb.String()
 }
 
-func stringifyExprStmt(stmt *ast.ExprStmt) string {
+func (m *mingo) stringifyExprStmt(stmt *ast.ExprStmt) string {
 	sb := new(strings.Builder)
-	sb.WriteString(stringifyExpr(stmt.X))
+	sb.WriteString(m.stringifyExpr(stmt.X))
 
 	return sb.String()
 }
 
-func stringifyDeclStmt(stmt *ast.DeclStmt) string {
+func (m *mingo) stringifyDeclStmt(stmt *ast.DeclStmt) string {
 	sb := new(strings.Builder)
-	sb.WriteString(stringifyDecl(stmt.Decl))
+	sb.WriteString(m.stringifyDecl(stmt.Decl))
 
 	return sb.String()
 }
 
-func stringifyDeferStmt(stmt *ast.DeferStmt) string {
+func (m *mingo) stringifyDeferStmt(stmt *ast.DeferStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString("defer ")
-	sb.WriteString(stringifyExpr(stmt.Call))
+	sb.WriteString(m.stringifyExpr(stmt.Call))
 
 	return sb.String()
 }
 
-func stringifyGoStmt(stmt *ast.GoStmt) string {
+func (m *mingo) stringifyGoStmt(stmt *ast.GoStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString("go ")
-	sb.WriteString(stringifyExpr(stmt.Call))
+	sb.WriteString(m.stringifyExpr(stmt.Call))
 
 	return sb.String()
 }
 
-func stringifyLabeledStmt(stmt *ast.LabeledStmt) string {
+func (m *mingo) stringifyLabeledStmt(stmt *ast.LabeledStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString(fmt.Sprintf("%s:", stmt.Label.Name))
-	sb.WriteString(stringifyStmt(stmt.Stmt))
+	sb.WriteString(m.stringifyStmt(stmt.Stmt))
 
 	return sb.String()
 }
 
-func stringifySwitchStmt(stmt *ast.SwitchStmt) string {
+func (m *mingo) stringifySwitchStmt(stmt *ast.SwitchStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString("switch ")
 	if stmt.Init != nil {
-		sb.WriteString(stringifyStmt(stmt.Init))
+		sb.WriteString(m.stringifyStmt(stmt.Init))
 		sb.WriteString(";")
 	}
 	if stmt.Tag != nil {
-		sb.WriteString(stringifyExpr(stmt.Tag))
+		sb.WriteString(m.stringifyExpr(stmt.Tag))
 	}
 	if stmt.Body != nil {
-		sb.WriteString(stringifyBlockStmt(stmt.Body))
+		sb.WriteString(m.stringifyBlockStmt(stmt.Body))
 	}
 
 	return sb.String()
 }
 
-func stringifySelectStmt(stmt *ast.SelectStmt) string {
+func (m *mingo) stringifySelectStmt(stmt *ast.SelectStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString("select ")
-	sb.WriteString(stringifyBlockStmt(stmt.Body))
+	sb.WriteString(m.stringifyBlockStmt(stmt.Body))
 
 	return sb.String()
 }
 
-func stringifyForStmt(stmt *ast.ForStmt) string {
+func (m *mingo) stringifyForStmt(stmt *ast.ForStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString("for ")
 
 	if stmt.Init != nil {
-		sb.WriteString(stringifyStmt(stmt.Init))
+		sb.WriteString(m.stringifyStmt(stmt.Init))
 	}
 	if stmt.Init != nil || stmt.Post != nil {
 		sb.WriteString(";")
 	}
 	if stmt.Cond != nil {
-		sb.WriteString(stringifyExpr(stmt.Cond))
+		sb.WriteString(m.stringifyExpr(stmt.Cond))
 	}
 	if stmt.Init != nil || stmt.Post != nil {
 		sb.WriteString(";")
 	}
 	if stmt.Post != nil {
-		sb.WriteString(stringifyStmt(stmt.Post))
+		sb.WriteString(m.stringifyStmt(stmt.Post))
 	}
-	sb.WriteString(stringifyBlockStmt(stmt.Body))
+	sb.WriteString(m.stringifyBlockStmt(stmt.Body))
 
 	return sb.String()
 }
 
-func stringifyRangeStmt(stmt *ast.RangeStmt) string {
+func (m *mingo) stringifyRangeStmt(stmt *ast.RangeStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString("for ")
 
 	needAssign := false
 	if stmt.Key != nil {
 		needAssign = true
-		sb.WriteString(stringifyExpr(stmt.Key))
+		sb.WriteString(m.stringifyExpr(stmt.Key))
 	}
 	if stmt.Value != nil {
 		needAssign = true
 		sb.WriteString(",")
-		sb.WriteString(stringifyExpr(stmt.Value))
+		sb.WriteString(m.stringifyExpr(stmt.Value))
 	}
 
 	if needAssign {
@@ -263,13 +263,13 @@ func stringifyRangeStmt(stmt *ast.RangeStmt) string {
 	}
 
 	sb.WriteString("range ")
-	sb.WriteString(stringifyExpr(stmt.X))
-	sb.WriteString(stringifyBlockStmt(stmt.Body))
+	sb.WriteString(m.stringifyExpr(stmt.X))
+	sb.WriteString(m.stringifyBlockStmt(stmt.Body))
 
 	return sb.String()
 }
 
-func stringifyBranchStmt(stmt *ast.BranchStmt) string {
+func (m *mingo) stringifyBranchStmt(stmt *ast.BranchStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString(stmt.Tok.String())
 	if stmt.Label != nil {
@@ -279,28 +279,28 @@ func stringifyBranchStmt(stmt *ast.BranchStmt) string {
 	return sb.String()
 }
 
-func stringifyEmptyStmt(_ *ast.EmptyStmt) string {
+func (m *mingo) stringifyEmptyStmt(_ *ast.EmptyStmt) string {
 	return ""
 }
 
-func stringifyIncDecStmt(stmt *ast.IncDecStmt) string {
+func (m *mingo) stringifyIncDecStmt(stmt *ast.IncDecStmt) string {
 	sb := new(strings.Builder)
-	sb.WriteString(stringifyExpr(stmt.X))
+	sb.WriteString(m.stringifyExpr(stmt.X))
 	sb.WriteString(stmt.Tok.String())
 
 	return sb.String()
 }
 
-func stringifySendStmt(stmt *ast.SendStmt) string {
+func (m *mingo) stringifySendStmt(stmt *ast.SendStmt) string {
 	sb := new(strings.Builder)
-	sb.WriteString(stringifyExpr(stmt.Chan))
+	sb.WriteString(m.stringifyExpr(stmt.Chan))
 	sb.WriteString("<-")
-	sb.WriteString(stringifyExpr(stmt.Value))
+	sb.WriteString(m.stringifyExpr(stmt.Value))
 
 	return sb.String()
 }
 
-func stringifyCaseCaluse(stmt *ast.CaseClause) string {
+func (m *mingo) stringifyCaseCaluse(stmt *ast.CaseClause) string {
 	sb := new(strings.Builder)
 
 	if len(stmt.List) > 0 {
@@ -309,14 +309,14 @@ func stringifyCaseCaluse(stmt *ast.CaseClause) string {
 			if i > 0 {
 				sb.WriteString(",")
 			}
-			sb.WriteString(stringifyExpr(expr))
+			sb.WriteString(m.stringifyExpr(expr))
 		}
 		sb.WriteString(":")
 	} else {
 		sb.WriteString("default:")
 	}
 	for i, child := range stmt.Body {
-		sb.WriteString(stringifyStmt(child))
+		sb.WriteString(m.stringifyStmt(child))
 		if i < len(stmt.Body)-1 {
 			sb.WriteString(";")
 		}
@@ -325,36 +325,36 @@ func stringifyCaseCaluse(stmt *ast.CaseClause) string {
 	return sb.String()
 }
 
-func stringifyCommClause(stmt *ast.CommClause) string {
+func (m *mingo) stringifyCommClause(stmt *ast.CommClause) string {
 	sb := new(strings.Builder)
 
 	if stmt.Comm != nil {
 		sb.WriteString("case ")
-		sb.WriteString(stringifyStmt(stmt.Comm))
+		sb.WriteString(m.stringifyStmt(stmt.Comm))
 		sb.WriteString(":")
 	} else {
 		sb.WriteString("default:")
 	}
 	for _, stmt := range stmt.Body {
-		sb.WriteString(stringifyStmt(stmt))
+		sb.WriteString(m.stringifyStmt(stmt))
 		sb.WriteString(";")
 	}
 
 	return sb.String()
 }
 
-func stringifyTypeSwitchStmt(stmt *ast.TypeSwitchStmt) string {
+func (m *mingo) stringifyTypeSwitchStmt(stmt *ast.TypeSwitchStmt) string {
 	sb := new(strings.Builder)
 	sb.WriteString("switch ")
 	if stmt.Init != nil {
-		sb.WriteString(stringifyStmt(stmt.Init))
+		sb.WriteString(m.stringifyStmt(stmt.Init))
 		sb.WriteString(";")
 	}
 	if stmt.Assign != nil {
-		sb.WriteString(stringifyStmt(stmt.Assign))
+		sb.WriteString(m.stringifyStmt(stmt.Assign))
 	}
 	if stmt.Body != nil {
-		sb.WriteString(stringifyBlockStmt(stmt.Body))
+		sb.WriteString(m.stringifyBlockStmt(stmt.Body))
 	}
 
 	return sb.String()
