@@ -48,11 +48,28 @@ func stringifyExpr(expr ast.Expr) string {
 		return stringifyStructType(x)
 	case *ast.FuncType:
 		return stringifyFuncType(x)
+	case *ast.IndexListExpr:
+		return stringifyIndexListExpr(x)
 	case nil:
 		return ""
 	}
 
 	return expr.(*ast.Ident).Name
+}
+
+func stringifyIndexListExpr(expr *ast.IndexListExpr) string {
+	sb := new(strings.Builder)
+
+	sb.WriteString("[")
+	for i, index := range expr.Indices {
+		if i > 0 {
+			sb.WriteString(",")
+		}
+		sb.WriteString(stringifyExpr(index))
+	}
+	sb.WriteString("]")
+
+	return sb.String()
 }
 
 func stringifySelectExpr(expr *ast.SelectorExpr) string {
