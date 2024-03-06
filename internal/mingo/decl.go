@@ -132,8 +132,6 @@ func (m *mingo) stringifyVarSpecs(specs []*ast.ValueSpec) string {
 	}
 
 	for i, spec := range specs {
-		fmt.Printf("comment: %#v\n", spec.Comment)
-
 		if i > 0 {
 			sb.WriteString(";")
 		}
