@@ -250,6 +250,11 @@ func stringifyStructType(expr *ast.StructType) string {
 			sb.WriteString(" ")
 		}
 		sb.WriteString(stringifyExpr(field.Type))
+
+		if field.Tag != nil {
+			sb.WriteString(" ")
+			sb.WriteString(field.Tag.Value)
+		}
 	}
 	sb.WriteString("}")
 
