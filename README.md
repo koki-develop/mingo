@@ -86,6 +86,12 @@ $ mingo main.go
 package main;import "fmt";func fibonacci(n int)int{if n<=1{return n};return fibonacci(n-1)+fibonacci(n-2)};func main(){n:=10;for i:=0;i<n;i++{fmt.Println(fibonacci(i))}};
 ```
 
+---
+
+An example of minifying [cLive](https://github.com/koki-develop/clive):
+
+- [Minified #128 - koki-develop/clive](https://github.com/koki-develop/clive/pull/128)
+
 ## LICENSE
 
 [MIT](./LICENSE)
