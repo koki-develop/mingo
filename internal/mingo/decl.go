@@ -132,6 +132,8 @@ func stringifyVarSpecs(specs []*ast.ValueSpec) string {
 	}
 
 	for i, spec := range specs {
+		fmt.Printf("comment: %#v\n", spec.Comment)
+
 		if i > 0 {
 			sb.WriteString(";")
 		}
@@ -166,5 +168,18 @@ func stringifyVarSpecs(specs []*ast.ValueSpec) string {
 }
 
 func stringifyTypeSpec(n *ast.TypeSpec) string {
-	return fmt.Sprintf("type %s %s", n.Name.Name, stringifyExpr(n.Type))
+	sb := new(strings.Builder)
+
+	sb.WriteString(fmt.Sprintf("type %s", n.Name.Name))
+	if n.TypeParams != nil {
+		sb.WriteString(stringifyFuncTypeParams(n.TypeParams))
+	}
+	if n.Assign != 0 {
+		sb.WriteString("=")
+	} else {
+		sb.WriteString(" ")
+	}
+	sb.WriteString(stringifyExpr(n.Type))
+
+	return sb.String()
 }
