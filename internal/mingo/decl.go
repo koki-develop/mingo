@@ -20,46 +20,31 @@ func (m *mingo) stringifyDecl(decl ast.Decl) string {
 func (m *mingo) stringifyGenDecl(n *ast.GenDecl) string {
 	switch n.Tok {
 	case token.IMPORT:
-		imports := []*ast.ImportSpec{}
-		for _, spec := range n.Specs {
-			imports = append(imports, spec.(*ast.ImportSpec))
-		}
-		return m.stringifyImportSpecs(imports)
+		return m.stringifyImportDecl(n)
 	case token.CONST:
-		consts := []*ast.ValueSpec{}
-		for _, spec := range n.Specs {
-			consts = append(consts, spec.(*ast.ValueSpec))
-		}
-		return m.stringifyConstSpecs(consts)
+		return m.stringifyConstDecl(n)
 	case token.VAR:
-		vars := []*ast.ValueSpec{}
-		for _, spec := range n.Specs {
-			vars = append(vars, spec.(*ast.ValueSpec))
-		}
-		return m.stringifyVarSpecs(vars)
+		return m.stringifyVarDecl(n)
 	case token.TYPE:
-		sb := new(strings.Builder)
-		for _, spec := range n.Specs {
-			sb.WriteString(m.stringifyTypeSpec(spec.(*ast.TypeSpec)))
-			sb.WriteString(";")
-		}
-		return sb.String()
+		return m.stringifyTypeSpec(n)
 	}
 
 	return ""
 }
 
-func (m *mingo) stringifyImportSpecs(specs []*ast.ImportSpec) string {
+func (m *mingo) stringifyImportDecl(decl *ast.GenDecl) string {
 	sb := new(strings.Builder)
 	sb.WriteString("import")
 
-	if len(specs) > 1 {
+	if len(decl.Specs) > 1 {
 		sb.WriteString("(")
 	} else {
 		sb.WriteString(" ")
 	}
 
-	for i, n := range specs {
+	for i, n := range decl.Specs {
+		n := n.(*ast.ImportSpec)
+
 		if i > 0 {
 			sb.WriteString(";")
 		}
@@ -70,24 +55,26 @@ func (m *mingo) stringifyImportSpecs(specs []*ast.ImportSpec) string {
 		}
 	}
 
-	if len(specs) > 1 {
+	if len(decl.Specs) > 1 {
 		sb.WriteString(")")
 	}
 	sb.WriteString(";")
 	return sb.String()
 }
 
-func (m *mingo) stringifyConstSpecs(specs []*ast.ValueSpec) string {
+func (m *mingo) stringifyConstDecl(decl *ast.GenDecl) string {
 	sb := new(strings.Builder)
 	sb.WriteString("const")
 
-	if len(specs) > 1 {
+	if len(decl.Specs) > 1 {
 		sb.WriteString("(")
 	} else {
 		sb.WriteString(" ")
 	}
 
-	for i, spec := range specs {
+	for i, spec := range decl.Specs {
+		spec := spec.(*ast.ValueSpec)
+
 		if i > 0 {
 			sb.WriteString(";")
 		}
@@ -114,24 +101,26 @@ func (m *mingo) stringifyConstSpecs(specs []*ast.ValueSpec) string {
 		}
 	}
 
-	if len(specs) > 1 {
+	if len(decl.Specs) > 1 {
 		sb.WriteString(")")
 	}
 	sb.WriteString(";")
 	return sb.String()
 }
 
-func (m *mingo) stringifyVarSpecs(specs []*ast.ValueSpec) string {
+func (m *mingo) stringifyVarDecl(decl *ast.GenDecl) string {
 	sb := new(strings.Builder)
 	sb.WriteString("var")
 
-	if len(specs) > 1 {
+	if len(decl.Specs) > 1 {
 		sb.WriteString("(")
 	} else {
 		sb.WriteString(" ")
 	}
 
-	for i, spec := range specs {
+	for i, spec := range decl.Specs {
+		spec := spec.(*ast.ValueSpec)
+
 		if i > 0 {
 			sb.WriteString(";")
 		}
@@ -158,26 +147,31 @@ func (m *mingo) stringifyVarSpecs(specs []*ast.ValueSpec) string {
 		}
 	}
 
-	if len(specs) > 1 {
+	if len(decl.Specs) > 1 {
 		sb.WriteString(")")
 	}
 	sb.WriteString(";")
 	return sb.String()
 }
 
-func (m *mingo) stringifyTypeSpec(n *ast.TypeSpec) string {
+func (m *mingo) stringifyTypeSpec(decl *ast.GenDecl) string {
 	sb := new(strings.Builder)
 
-	sb.WriteString(fmt.Sprintf("type %s", n.Name.Name))
-	if n.TypeParams != nil {
-		sb.WriteString(m.stringifyFuncTypeParams(n.TypeParams))
+	for _, n := range decl.Specs {
+		n := n.(*ast.TypeSpec)
+
+		sb.WriteString(fmt.Sprintf("type %s", n.Name.Name))
+		if n.TypeParams != nil {
+			sb.WriteString(m.stringifyFuncTypeParams(n.TypeParams))
+		}
+		if n.Assign != 0 {
+			sb.WriteString("=")
+		} else {
+			sb.WriteString(" ")
+		}
+		sb.WriteString(m.stringifyExpr(n.Type))
+		sb.WriteString(";")
 	}
-	if n.Assign != 0 {
-		sb.WriteString("=")
-	} else {
-		sb.WriteString(" ")
-	}
-	sb.WriteString(m.stringifyExpr(n.Type))
 
 	return sb.String()
 }
