@@ -198,7 +198,7 @@ func stringifyChanType(expr *ast.ChanType) string {
 	if expr.Dir == ast.RECV {
 		sb.WriteString("<-")
 	}
-	sb.WriteString("chan")
+	sb.WriteString("chan ")
 	sb.WriteString(stringifyExpr(expr.Value))
 
 	return sb.String()
