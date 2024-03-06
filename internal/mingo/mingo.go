@@ -17,8 +17,16 @@ func Minify(filename string, src []byte) (string, error) {
 	}
 
 	fset := token.NewFileSet()
+	m := &mingo{fileSet: fset}
+	return m.Minify(filename, src)
+}
 
-	file, err := parser.ParseFile(fset, filename, string(src), 0)
+type mingo struct {
+	fileSet *token.FileSet
+}
+
+func (m *mingo) Minify(filename string, src []byte) (string, error) {
+	file, err := parser.ParseFile(m.fileSet, filename, string(src), 0)
 	if err != nil {
 		return "", err
 	}
