@@ -34,7 +34,7 @@ func (m *mingo) Minify(filename string, src []byte) (string, error) {
 
 	for _, cg := range file.Comments {
 		for _, c := range cg.List {
-			dirs := []string{"//go:build ", "//go:generate "}
+			dirs := []string{"//go:build ", "// +build ", "//go:generate "}
 			for _, prefix := range dirs {
 				if strings.HasPrefix(c.Text, prefix) {
 					fmt.Fprintln(sb, c.Text)
