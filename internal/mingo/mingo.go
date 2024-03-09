@@ -1,6 +1,7 @@
 package mingo
 
 import (
+	"bytes"
 	"fmt"
 	"go/format"
 	"go/parser"
@@ -8,9 +9,9 @@ import (
 	"strings"
 )
 
-func Minify(filename string, src []byte) (string, error) {
+func Minify(filename string, src []byte) ([]byte, error) {
 	if s, err := format.Source(src); err != nil {
-		return "", err
+		return nil, err
 	} else {
 		src = s
 	}
@@ -24,29 +25,29 @@ type mingo struct {
 	fileSet *token.FileSet
 }
 
-func (m *mingo) Minify(filename string, src []byte) (string, error) {
+func (m *mingo) Minify(filename string, src []byte) ([]byte, error) {
 	file, err := parser.ParseFile(m.fileSet, filename, string(src), parser.ParseComments)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	sb := new(strings.Builder)
+	b := new(bytes.Buffer)
 
 	for _, cg := range file.Comments {
 		for _, c := range cg.List {
 			dirs := []string{"//go:build ", "// +build ", "//go:generate "}
 			for _, prefix := range dirs {
 				if strings.HasPrefix(c.Text, prefix) {
-					fmt.Fprintln(sb, c.Text)
+					fmt.Fprintln(b, c.Text)
 				}
 			}
 		}
 	}
 
-	fmt.Fprint(sb, m.stringifyFile(file))
+	fmt.Fprint(b, m.stringifyFile(file))
 	for _, decl := range file.Decls {
-		fmt.Fprint(sb, m.stringifyDecl(decl))
+		fmt.Fprint(b, m.stringifyDecl(decl))
 	}
 
-	return sb.String(), nil
+	return b.Bytes(), nil
 }

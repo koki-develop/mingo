@@ -32,7 +32,7 @@ func Test_Minify(t *testing.T) {
 
 			got, err := Minify("main.go", src)
 			assert.NoError(t, err)
-			assert.Equal(t, string(want), got)
+			assert.Equal(t, string(want), string(got))
 
 			// check syntax
 			_, err = format.Source([]byte(got))
