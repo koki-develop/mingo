@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -48,6 +49,10 @@ var rootCmd = &cobra.Command{
 				}
 
 				if flagWrite {
+					if bytes.Equal(src, min) {
+						return nil
+					}
+
 					f, err := os.Create(path)
 					if err != nil {
 						return err
@@ -55,6 +60,9 @@ var rootCmd = &cobra.Command{
 					defer f.Close()
 
 					if _, err := fmt.Fprint(f, min); err != nil {
+						return err
+					}
+					if _, err := fmt.Fprintln(os.Stdout, path); err != nil {
 						return err
 					}
 				} else {
