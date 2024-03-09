@@ -58,13 +58,9 @@ var rootCmd = &cobra.Command{
 					if _, err := f.Write(min); err != nil {
 						return err
 					}
-					if _, err := fmt.Fprintln(os.Stdout, path); err != nil {
-						return err
-					}
+					fmt.Println(path)
 				} else {
-					if _, err := os.Stdout.Write(min); err != nil {
-						return err
-					}
+					fmt.Println(string(min))
 				}
 
 				return nil
