@@ -59,14 +59,14 @@ var rootCmd = &cobra.Command{
 					}
 					defer f.Close()
 
-					if _, err := fmt.Fprint(f, min); err != nil {
+					if _, err := f.Write(min); err != nil {
 						return err
 					}
 					if _, err := fmt.Fprintln(os.Stdout, path); err != nil {
 						return err
 					}
 				} else {
-					if _, err := fmt.Fprintln(os.Stdout, min); err != nil {
+					if _, err := os.Stdout.Write(min); err != nil {
 						return err
 					}
 				}
